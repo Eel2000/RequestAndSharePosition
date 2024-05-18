@@ -164,5 +164,27 @@ namespace RequestAndSharePosition.Services
                 Data = users
             };
         }
+
+        public async ValueTask<object> GetUserAsync(string connectedUser)
+        {
+            var users = userManager.Users.Where(x => x.Id != connectedUser).Select((u) =>
+                new
+                {
+                    UserId = u.Id,
+                    userName = u.UserName,
+                    Email = u.Email,
+                    PhoneNumber = u.PhoneNumber,
+                    IsEmailConfirm = u.EmailConfirmed
+                }).ToFrozenSet();
+
+            await Task.Delay(500);
+
+            return new
+            {
+                status = true,
+                message = "List of all users",
+                Data = users
+            };
+        }
     }
 }

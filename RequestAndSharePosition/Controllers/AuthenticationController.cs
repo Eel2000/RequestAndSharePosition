@@ -45,7 +45,17 @@ namespace RequestAndSharePosition.Controllers
         [HttpGet("infos"), Authorize]
         public async ValueTask<IActionResult> GetInfosAsync()
         {
-            return Ok(await authentication.GetUserAsync());
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return BadRequest(new
+                {
+                    status = false,
+                    message = "User not found",
+                });
+            }
+
+            return Ok(await authentication.GetUserAsync(userId));
         }
     }
 }

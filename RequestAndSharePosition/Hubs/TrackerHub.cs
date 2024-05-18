@@ -60,7 +60,9 @@ public sealed class TrackerHub(ApplicationDbContext dbContext, ILogger<TrackerHu
             var ops = await dbContext
                  .Requests
                  .Where(r => r.Id == requestId && r.IsActive && !r.Accepted)
-                 .ExecuteUpdateAsync(r => r.SetProperty(r => r.Accepted, true));
+                 .ExecuteUpdateAsync(r => 
+                 r.SetProperty(r => r.Accepted, true)
+                 .SetProperty(r => r.AcceptedDate, DateTimeOffset.Now));
 
             if (ops is 0)
             {

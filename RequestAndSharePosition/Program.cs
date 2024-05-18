@@ -118,6 +118,7 @@ builder.Services.AddSignalR();
 builder.Services.AddSingleton<IUserIdProvider, AppHubUserProvider>();
 
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<ITrackingService, TrackingService>();
 
 var app = builder.Build();
 

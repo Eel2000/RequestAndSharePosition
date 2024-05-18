@@ -20,5 +20,7 @@ namespace RequestAndSharePosition.Shared
 
         [DefaultValue(true)]
         public bool IsActive { get; set; } = true;
+        public DateTimeOffset DateTime { get; set; } = DateTimeOffset.Now;
+        public DateTimeOffset AcceptedDate { get; set; }
     }
 }
