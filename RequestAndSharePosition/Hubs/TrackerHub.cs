@@ -17,7 +17,8 @@ public sealed class TrackerHub(ApplicationDbContext dbContext, ILogger<TrackerHu
             {
                 Sender = request.Sender,
                 Receiver = request.Receiver,
-                Message = request.Message
+                Message = request.Message,
+                SenderName = Context?.User?.Identity?.Name
             };
 
             await dbContext.Requests.AddAsync(newRequest);
@@ -60,7 +61,7 @@ public sealed class TrackerHub(ApplicationDbContext dbContext, ILogger<TrackerHu
             var ops = await dbContext
                  .Requests
                  .Where(r => r.Id == requestId && r.IsActive && !r.Accepted)
-                 .ExecuteUpdateAsync(r => 
+                 .ExecuteUpdateAsync(r =>
                  r.SetProperty(r => r.Accepted, true)
                  .SetProperty(r => r.AcceptedDate, DateTimeOffset.Now));
 

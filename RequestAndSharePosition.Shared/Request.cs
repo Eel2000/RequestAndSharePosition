@@ -11,8 +11,11 @@ namespace RequestAndSharePosition.Shared
         [Required]
         public required string Sender { get; set; }
 
+        public string? SenderName { get; set; }
+
         [Required]
         public required string Receiver { get; set; }
+
         public string? Message { get; set; }
 
         [DefaultValue(false)]
