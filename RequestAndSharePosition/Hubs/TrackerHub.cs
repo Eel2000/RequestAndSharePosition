@@ -58,21 +58,22 @@ public sealed class TrackerHub(ApplicationDbContext dbContext, ILogger<TrackerHu
     {
         try
         {
-            var ops = await dbContext
+            var request = await dbContext
                  .Requests
-                 .Where(r => r.Id == requestId && r.IsActive && !r.Accepted)
-                 .ExecuteUpdateAsync(r =>
-                 r.SetProperty(r => r.Accepted, true)
-                 .SetProperty(r => r.AcceptedDate, DateTimeOffset.Now));
+                 .FirstOrDefaultAsync(r => r.Id == requestId && r.Accepted != true);
 
-            if (ops is 0)
+            if (request is null)
             {
                 logger.LogWarning($"Request {requestId} not found or already accepted.");
                 await Clients.Caller.AcceptanceFailedAsync(false, "Request not found or already accepted.");
                 return;
             }
 
-            var request = await dbContext.Requests.FirstOrDefaultAsync(r => r.Id == requestId && r.IsActive && r.Accepted);
+            request.Accepted = true;
+
+
+            dbContext.Requests.Update(request);
+            await dbContext.SaveChangesAsync();
 
             if (request is null)
             {
@@ -95,7 +96,9 @@ public sealed class TrackerHub(ApplicationDbContext dbContext, ILogger<TrackerHu
             await Groups.AddToGroupAsync(request.Receiver, sharingGroup.Id.ToString());
 
             await Clients.User(request.Sender).RequestAcceptedAsync(sharingGroup.Id);
-            await Clients.Caller.RequestAcceptedAsync(true, string.Empty);
+            await Clients.Caller.AcceptedAsync(true, string.Empty);
+
+            logger.LogInformation($"Request {requestId} accepted successfully. sender {request.Sender} receiver {request.Receiver}");
         }
         catch (Exception ex)
         {
